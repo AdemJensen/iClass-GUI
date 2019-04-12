@@ -3,6 +3,7 @@ package top.chorg;
 import top.chorg.system.Sys;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -12,11 +13,12 @@ public class ForeGuiAdapter {
      * This method will be invoked by the AftGuiAdapter.
      */
     public static void init() {
-        register("startup", top.chorg.adapters.auth.OpenLoginWindow.class);
-        register("gotLoginResult", top.chorg.adapters.auth.GetLoginResult.class);
+        register("startup", top.chorg.adapters.auth.OpenLoginWindow.class, "onInvoke");
+        register("gotLoginResult", top.chorg.adapters.auth.GetLoginResult.class, "onInvoke");
     }
 
-    private static HashMap<String, Class<?>> records = new HashMap<>();
+    private static HashMap<String, Class<?>> ClassRecords = new HashMap<>();
+    private static HashMap<String, Method> MethodRecords = new HashMap<>();
 
     /**
      * Run the event.
@@ -27,14 +29,16 @@ public class ForeGuiAdapter {
      */
     public static int makeEvent(String...args) {
         if (!containsEvent(args[0])) {
+            Sys.warnF("Adapter", "Unhandled event (%s).", args[0]);
+            Sys.devInfoF("Adapter", "Unhandled event arguments are: (%s).", Arrays.toString(args));
             return -1;
         }
-        Class<?> adapter = records.get(args[0]);
         try {
             String[] vars = new String[args.length - 1];
             System.arraycopy(args, 1, vars, 0, args.length - 1);
-            return ((WindowEventsAdapter) adapter.getDeclaredConstructor(String[].class).newInstance((Object) vars))
-                    .onInvoke();
+            return (int) MethodRecords.get(args[0]).invoke(
+                    ClassRecords.get(args[0]).getDeclaredConstructor(String[].class).newInstance((Object) vars)
+            );
         } catch (InstantiationException | IllegalAccessException
                 | InvocationTargetException | NoSuchMethodException e) {
             Sys.err("Adapter", "Error while making event.");
@@ -51,11 +55,11 @@ public class ForeGuiAdapter {
     }
 
     public static boolean containsEvent(String key) {
-        return records.containsKey(key);
+        return ClassRecords.containsKey(key);
     }
 
-    public static void register(String name, Class<?> event) {
-        if (records.containsKey(name)) {
+    public static void register(String name, Class<?> event, String methodName) {
+        if (ClassRecords.containsKey(name)) {
             Sys.errF(
                     "Adapter",
                     "Interface '%s' already exists!",
@@ -63,6 +67,23 @@ public class ForeGuiAdapter {
             );
             Sys.exit(3);
         }
-        records.put(name, event);
+        if (!event.getSuperclass().equals(WindowEventsAdapter.class)) {
+            Sys.errF(
+                    "Adapter",
+                    "Register target (%s) is not a WindowEventsAdapter!",
+                    event
+            );
+        }
+        try {
+            Method method = event.getMethod(methodName);
+            MethodRecords.put(name, method);
+        } catch (NoSuchMethodException e) {
+            Sys.errF(
+                "Adapter",
+                "Register event (%s) cannot find method (%s)!",
+                event, methodName
+            );
+        }
+        ClassRecords.put(name, event);
     }
 }

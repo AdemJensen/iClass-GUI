@@ -10,7 +10,6 @@ public class OpenLoginWindow extends WindowEventsAdapter {
         super(args);
     }
 
-    @Override
     public int onInvoke() throws IllegalArgumentException {
         if (!WindowManager.add(new LoginFrameTest(), 1)) {
             System.out.println("ERROR");

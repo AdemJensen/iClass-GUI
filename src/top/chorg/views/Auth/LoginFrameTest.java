@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.lang.reflect.Method;
 
 public class LoginFrameTest extends JFrame {
     protected MyNoBackgroundButton check = new MyNoBackgroundButton("确认");
@@ -139,9 +138,13 @@ public class LoginFrameTest extends JFrame {
     }
 }
 class CheckFrame extends JFrame{
+    boolean ok = false;
     CheckFrame(boolean b){
         JLabel label;
-        if (b) label = new JLabel("Successful logged in!");
+        if (b) {
+            ok = true;
+            label = new JLabel("Successful logged in!");
+        }
         else label = new JLabel("Wrong password!");
         //label.setPreferredSize(new Dimension(100, 50));
         Container container = this.getContentPane();
@@ -152,8 +155,10 @@ class CheckFrame extends JFrame{
         this.setBounds(500, 400, 500, 200);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                WindowManager.get(1, LoginFrameTest.class).dispose();
-                WindowManager.remove(1);
+                if (CheckFrame.this.ok) {
+                    WindowManager.get(1, LoginFrameTest.class).dispose();
+                    WindowManager.remove(1);
+                }
                 dispose();
             }
         });

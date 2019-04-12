@@ -14,8 +14,6 @@ public abstract class WindowEventsAdapter {
     private String[] args;        // Arguments passed through assignArgs(Serializable).
     private int argIndex = 0;
 
-    public abstract int onInvoke() throws IllegalArgumentException;
-
     protected final int argAmount() {
         return args.length;
     }

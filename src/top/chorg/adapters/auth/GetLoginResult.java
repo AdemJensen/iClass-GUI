@@ -10,7 +10,6 @@ public class GetLoginResult extends WindowEventsAdapter {
         super(args);
     }
 
-    @Override
     public int onInvoke() throws IllegalArgumentException {
         if (!WindowManager.containsKey(1)) return 1;
         (WindowManager.get(1, LoginFrameTest.class)).loginResult(nextArg());
