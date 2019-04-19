@@ -25,6 +25,7 @@ public class Global {
     public static Gson gson = new Gson();    // Json utils.
 
     public static CmdManager cmdManPrivate = new CmdManager();
+    // This is only a structure. When the father progress is loaded, This statement won't be enabled.
 
     private static HashMap<String, Object> variables = new HashMap<>();     // Contains global variables.
 

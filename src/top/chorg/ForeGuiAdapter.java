@@ -1,5 +1,6 @@
 package top.chorg;
 
+import top.chorg.system.Global;
 import top.chorg.system.Sys;
 
 import java.lang.reflect.InvocationTargetException;
