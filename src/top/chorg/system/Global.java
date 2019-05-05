@@ -2,8 +2,9 @@ package top.chorg.system;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.Primitives;
+import top.chorg.gui.GuiAdapter;
+import top.chorg.kernel.cmd.CmdManager;
 
-import java.sql.Connection;
 import java.util.HashMap;
 
 /**
@@ -20,13 +21,30 @@ import java.util.HashMap;
  * </ul>
  */
 public class Global {
-    public static Connection database;
-
-    public static Gson gson = new Gson();    // Json utils.
-
     public static CmdManager cmdManPrivate = new CmdManager();
 
-    private static HashMap<String, Object> variables = new HashMap<>();     // Contains global variables.
+    public static Gson gson = new Gson();    // Json utils.
+    public static Config conf = new Config();     // Contains configuration variables.
+
+    public static GuiAdapter guiAdapter;
+
+    private static HashMap<Object, Object> variables = new HashMap<>();     // Contains global variables.
+
+    /**
+     * Modify or add a value in the global variable field.
+     *
+     * @param key Key of targeted global variable.
+     * @param value Value of targeted global variable.
+     */
+    public static void setVar(Object key, Object value) {
+        if (variables.containsKey(key)) {
+            //String ori = variables.get(key).toString();
+            variables.replace(key, value);
+            //Sys.devInfoF("Global","Global '%s' replaced ('%s' -> '%s').", key, ori, value.toString());
+        } else {
+            variables.put(key, value);
+        }
+    }
 
     /**
      * Get variable from global variable field, if null will cause system failure.
@@ -34,7 +52,7 @@ public class Global {
      * @param key Key of targeted global variable.
      * @return Value of targeted global variable.
      */
-    public static <T> T getVarCon(String key, Class<T> typeOfVal) {
+    public static <T> T getVarCon(Object key, Class<T> typeOfVal) {
         if (!variables.containsKey(key)) throw new NullPointerException();
         T result = Primitives.wrap(typeOfVal).cast(variables.get(key));
         if (result == null) throw new NullPointerException();
@@ -47,7 +65,7 @@ public class Global {
      * @param key Key of targeted global variable.
      * @return Value of targeted global variable.
      */
-    public static <T> T getVar(String key, Class<T> typeOfVal) {
+    public static <T> T getVar(Object key, Class<T> typeOfVal) {
         if (!variables.containsKey(key)) {
             return null;
         }
@@ -60,7 +78,7 @@ public class Global {
      * @param key Key of targeted global variable.
      * @return Value of targeted global variable.
      */
-    public static Object getVar(String key) {
+    public static Object getVar(Object key) {
         if (!variables.containsKey(key)) {
             return null;
         }
@@ -73,7 +91,7 @@ public class Global {
      * @param key Key of targeted global variable.
      * @return True if the global variable exists in the global variable field, false if not.
      */
-    public static boolean varExists(String key) {
+    public static boolean varExists(Object key) {
         return variables.containsKey(key);
     }
 
@@ -82,7 +100,7 @@ public class Global {
      *
      * @param key Key of targeted global variable.
      */
-    public static void dropVar(String key) {
+    public static void dropVar(Object key) {
         if (varExists(key)) variables.remove(key);
     }
 

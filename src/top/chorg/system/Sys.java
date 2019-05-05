@@ -7,8 +7,6 @@ import java.util.Formatter;
  * Fully static, no need to make instance.
  */
 public class Sys {
-    public static boolean dev_mode = false;
-
     /**
      * Send master warning message to the console or log.
      * If under dev environment or cmd line environment, the message will be sent to console.
@@ -129,7 +127,17 @@ public class Sys {
      * @return True if current environment is development env.
      */
     public static boolean isDevEnv() {
-        return dev_mode;
+        return true;
+    }
+
+    /**
+     * To judge if current environment is development env or not.
+     * Default value is false.
+     *
+     * @return True if current environment is development env.
+     */
+    public static boolean isGuiDevEnv() {
+        return true;
     }
 
     /**

@@ -1,7 +1,5 @@
 package top.chorg.support;
 
-import top.chorg.system.Sys;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -39,13 +37,13 @@ public class DateTime {
         this.date.minusOneMonth();
     }
 
-    public void assign(String string) {
+    public void assign(String string) throws IllegalArgumentException {
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //创建要显示的日期格式
-        java.util.Date date = null;      //将从数据库读出来的 timestamp 类型的时间转换为java的Date类型
+        java.util.Date date;      //将从数据库读出来的 timestamp 类型的时间转换为java的Date类型
         try {
             date = fmt.parse(string);
         } catch (ParseException e) {
-            Sys.err("DATETIME", "INVALID PARSE.");
+            throw new IllegalArgumentException();
         }
         string = fmt.format(date);
         var middle = string.split(" ", 2);
@@ -146,8 +144,8 @@ public class DateTime {
     }
 
     public boolean smallerThan(DateTime alter) {
-        if (!this.date.smallerThan(alter.date) && !this.date.equals(alter.date)) return false;
         if (this.date.smallerThan(alter.date)) return true;
+        if (!this.date.equals(alter.date)) return false;
         if (this.hour > alter.hour) return false;
         if (this.hour < alter.hour) return true;
         if (this.minute > alter.minute) return false;
@@ -170,6 +168,7 @@ public class DateTime {
 
     @Override
     public String toString() {
-        return String.format("%d-%d-%d %d:%d:%d", this.getYear(), this.getMonth(), this.getDay(), hour, minute, second);
+        return String.format("%d-%02d-%02d %02d:%02d:%02d",
+                this.getYear(), this.getMonth(), this.getDay(), hour, minute, second);
     }
 }
